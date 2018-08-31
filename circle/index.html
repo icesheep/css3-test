@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="index.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="div1">
+        <canvas id="canvas1"    width="300" height="350" style="border:1px solid #d3d3d3;">
+
+        </canvas>
+    </div>
+</body>
+<script>
+    var c = document.getElementById('canvas1');
+    var ctx = c.getContext("2d");
+    // setInterval(draw,16);
+    draw();
+
+    function draw(){
+        ctx.clearRect(0, 0, 300, 350);
+        //圆坐标
+        drawCircle(ctx,150,150,100,2 * Math.PI,'gray');
+
+        //x轴
+        drawLine(ctx,20,150,280,150,'gray'); 
+        //y轴
+        drawLine(ctx,150,20,150,280,'gray'); 
+
+        //角度
+        ctx.font="16px Arial";
+        var time = new Date();
+        var angle = 2*Math.PI/60*time.getSeconds()+2*Math.PI/60000*time.getMilliseconds();
+        // console.log(angle);
+        var x = Math.cos(angle);
+        var y = Math.sin(angle);
+        ctx.fillStyle = 'red';
+        ctx.fillText("angle"+angle.toFixed(2), 125, 15);
+        
+        drawCircle(ctx,150,150,20,2*Math.PI,'yellow','yellow');
+        drawCircle2(ctx,150,150,20,angle,'gray','gray');
+
+        // 转动线
+        drawLine(ctx,150,150,150+x*100,150+y*100,'red'); 
+        drawCircle(ctx,150+x*100,150+y*100,5,2 * Math.PI,'red','red');
+
+        // x线
+        ctx.fillStyle = 'green';
+        ctx.fillText("cos",270,140);
+        ctx.fillText("x=cos(angle)="+x.toFixed(2), 105, 315);
+        drawLine(ctx,150,150,150+x*100,150,'green'); 
+        drawCircle(ctx,150+x*100,150,5,2 * Math.PI,'green','green');
+
+        // y线
+        ctx.fillStyle = 'blue';
+        ctx.fillText("sin",155,275);
+        ctx.fillText("y=sin(angle)="+y.toFixed(2), 105, 340);
+        drawLine(ctx,150,150,150,150+y*100,'blue'); 
+        drawCircle(ctx,150,150+y*100,5,2 * Math.PI,'blue','blue');
+
+        // 虚线
+        drawDashLine(ctx,150+x*100,150+y*100,150,150+y*100,'gray');
+        drawDashLine(ctx,150+x*100,150+y*100,150+x*100,150,'gray');
+
+        requestAnimationFrame(draw);
+    }
+
+    function drawLine(ctx,x,y,x1,y1,color) {
+        ctx.beginPath();
+        ctx.setLineDash([]);
+        ctx.moveTo(x,y);
+        ctx.lineTo(x1,y1);
+        ctx.strokeStyle=color;
+        ctx.stroke();
+        ctx.closePath();   
+    }
+
+    function drawDashLine(ctx,x,y,x1,y1,color) {
+        ctx.beginPath();
+        ctx.setLineDash([20, 5]);  // [实线长度, 间隙长度]
+        ctx.lineDashOffset = -0;
+        ctx.moveTo(x,y);
+        ctx.lineTo(x1,y1);
+        ctx.strokeStyle=color;
+        ctx.stroke();
+        ctx.closePath();   
+    }
+
+    function drawCircle(ctx,x,y,pi,radius,color,fillColor) {
+        ctx.beginPath();
+        ctx.setLineDash([]);
+        ctx.strokeStyle=color;
+        ctx.arc(x, y, pi, 0,radius);
+        if(fillColor) {
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+        }
+        ctx.stroke();
+        ctx.closePath();   
+    }
+
+    function drawCircle2(ctx,x,y,pi,radius,color,fillColor) {
+        ctx.beginPath();
+        ctx.strokeStyle=color;
+        // ctx.translate(x,y);
+        ctx.moveTo(x,y);
+        ctx.arc(x, y, pi, 0,radius);
+        if(fillColor) {
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+        }
+        ctx.stroke();
+        ctx.closePath();   
+    }
+</script>
+
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="index.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="div1">
+        <canvas id="canvas1"    width="600" height="600" style="border:1px solid #d3d3d3;">
+
+        </canvas>
+    </div>
+</body>
+<script>
+    let planets = [{
+        img: "shui.jpg",
+        distance: 57.909175,
+        radius: 2439.7,
+        rotate: 87.97,
+        clock: true,
+    },{
+        img: "jin.jpg",
+        distance: 108.20893,
+        radius: 6051.8,
+        rotate: 224.7,
+        clock: false,
+    },{
+        img: "earth.jpg",
+        distance: 149.59789,
+        radius: 6378.14,
+        rotate: 365,
+        clock: true,
+    },{
+        img: "huo.jpg",
+        distance: 227.93664,
+        radius: 3397,
+        rotate: 686.93,
+        clock: true,
+    },{
+        img: "mu.jpg",
+        distance: 778.41202,
+        radius: 71492,
+        rotate: 11.8565*365,
+        clock: true,
+    },{
+        img: "tu.jpg",
+        distance: 1426.7254,
+        radius: 60268,
+        rotate: 29.448*365,
+        clock: true,
+    },{
+        img: "tianwang.jpg",
+        distance: 2870.9722,
+        radius: 25559,
+        rotate: 84.02*365,
+        clock: true,
+    },{
+        img: "haiwang.jpg",
+        distance: 4498.2529,
+        radius: 24764,
+        rotate: 164.79*365,
+        clock: true,
+    }];
+    let sun;
+    let earth;
+    // let moon;
+    let ctx;
+    function init(){
+        sun = new Image();
+        earth = new Image();
+        // moon = new Image();
+        sun.src = "sun.png";
+        earth.src = "earth.jpg";
+        // moon.src = "moon.jpg";
+
+        var c = document.getElementById('canvas1');
+        ctx = c.getContext("2d");
+
+        sun.onload = function (){
+            draw()
+        }
+
+    }
+    init();
+    function draw(){
+        ctx.clearRect(0, 0, 600, 600); //清空所有的内容
+        /*绘制 太阳*/
+        ctx.drawImage(sun, 0, 0, 600, 600);
+        ctx.save();
+        ctx.translate(300, 300);
+        let time = new Date();
+        let temp = 2 * Math.PI / 6 * time.getSeconds() + 2 * Math.PI / 6000 * time.getMilliseconds();
+        
+        for(i = 0; i < 8; i++) {
+            let angle = ((2 * Math.PI / 60 * time.getSeconds() + 2 * Math.PI / 60000 * time.getMilliseconds())/(planets[i].rotate/365)*10)%(2 * Math.PI);
+            let x = Math.cos(angle);
+            let y = Math.sin(angle);
+            ctx.beginPath();
+            ctx.strokeStyle = "rgba(255,255,0,0.5)";
+            ctx.arc(0, 0, 34*(i+1), 0, 2 * Math.PI);
+            ctx.stroke();
+            // console.log('i......'+i+':'+(2 * Math.PI / 60 * time.getSeconds() + 2 * Math.PI / 60000 * time.getMilliseconds())/(planets[i].rotate/365))
+            // ctx.rotate((2 * Math.PI / 60 * time.getSeconds() + 2 * Math.PI / 60000 * time.getMilliseconds())/(planets[i].rotate/365));
+            // ctx.rotate(.5*Math.PI);
+            // ctx.translate(34, 0);
+            let img = new Image();
+            img.src = planets[i].img;
+            ctx.drawImage(img, x*34*(i+1)-12, y*34*(i+1)-12);
+            
+            // drawPlanet(earth,12,temp,34,0);
+        }
+
+        // //绘制earth轨道
+        // ctx.beginPath();
+        // ctx.strokeStyle = "rgba(255,255,0,0.5)";
+        // ctx.arc(0, 0, 100, 0, 2 * Math.PI)
+        // ctx.stroke()
+
+        // let time = new Date();
+        // //绘制地球
+        // ctx.rotate(2 * Math.PI / 60 * time.getSeconds() + 2 * Math.PI / 60000 * time.getMilliseconds())
+        // ctx.translate(100, 0);
+        // ctx.drawImage(earth, -12, -12)
+
+        // //绘制月球轨道
+        // ctx.beginPath();
+        // ctx.strokeStyle = "rgba(255,255,255,.3)";
+        // ctx.arc(0, 0, 40, 0, 2 * Math.PI);
+        // ctx.stroke();
+
+        // //绘制月球
+        // ctx.rotate(2 * Math.PI / 6 * time.getSeconds() + 2 * Math.PI / 6000 * time.getMilliseconds());
+        // ctx.translate(40, 0);
+        // ctx.drawImage(moon, -3.5, -3.5);
+        ctx.restore();
+        requestAnimationFrame(draw);
+    }
+
+    function drawCircle(radius){
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(255,255,255,.5)";
+        ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+        ctx.stroke();
+    }
+
+    function drawPlanet(img,imgWidth,rotate,x,y) {
+        ctx.rotate(rotate);
+        ctx.translate(x, y);
+        ctx.drawImage(img, -imgWidth, -imgWidth);
+    }
+</script>
+
+</html>
