@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="index.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="div1">
+        <!-- <canvas id="canvas" width="600" height="300" style="border:1px solid #d3d3d3;">
+
+        </canvas>
+        <canvas id="tutorial2" width="300" height="300" style="border:1px solid #d3d3d3;margin-left: -1px;">
+
+        </canvas> -->
+    </div>
+</body>
+<script>
+    function valueMapping(x, inMin, inMax, outMin, outMax) {
+        return (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+    }
+
+    let isDrawCircle = false;
+
+    const canvas = {
+        init() {
+            this.ele = document.createElement('canvas');
+            // this.ele.width = document.getElementsByClassName('div1')[0].offsetWidth;
+            // this.ele.height = document.getElementsByClassName('div1')[0].offsetHeight;
+            document.getElementsByClassName('div1')[0].appendChild(this.ele);
+            this.resize();
+            window.addEventListener('resize', () => this.resize(), false);
+            this.ctx = this.ele.getContext('2d');
+            console.log(this.ele);
+            return this.ctx;
+        },
+        onResize(callback) {
+            this.resizeCallback = callback;
+        },
+        resize() {
+            this.width = this.ele.width = this.ele.offsetWidth;
+            this.height = this.ele.height = this.ele.offsetHeight;
+            this.resizeCallback && this.resizeCallback();
+            console.log(this.ele);
+        },
+        run(callback) {
+            requestAnimationFrame(() => {
+                this.run(callback);
+            });
+            callback(this.ctx);
+        }
+    }
+
+    const ctx = canvas.init();
+
+    class Wave {
+        constructor(cavans, options) {
+            this.canvas = canvas;
+            this.options = options;
+            this.xMove = this.options.offset;
+            this.xSpeed = this.options.xSpeed;
+            this.resize();
+        }
+        resize() {
+            this.width = canvas.width;
+            this.height = canvas.height;
+            this.amplitude = this.canvas.height * this.options.amplitude;
+        }
+
+        draw(ctx) {
+            if(!isDrawCircle) {
+                drawCircle();
+            }
+            ctx.beginPath();
+            this.xMove += this.xSpeed;
+            ctx.moveTo(0, this.height / 2);
+            var grad = ctx.createLinearGradient(0, 0, this.width, 0);
+            grad.addColorStop(0, this.options.start);
+            grad.addColorStop(1, this.options.stop);
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = this.options.lineWidth;
+            for (let x = 0; x < this.width; x++) {
+                const radians = x / this.width * Math.PI * 2;
+                const scale = (Math.sin(radians - Math.PI * 0.5) + 1) * 0.5;
+                const y = Math.sin(x * 0.02 + this.xMove) * 20 + this.height * (1 - this.options.yOffset);
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(this.width,this.height);
+            ctx.lineTo(0,this.height);
+            ctx.fillStyle = this.options.fillStyle;
+            ctx.fill();
+            ctx.closePath();
+        }
+    }
+
+    const gradients = [
+        ['#6e45e2', '#88d3ce'],
+        ['#de6262', '#ffb88c'],
+        ['#64b3f4', '#c2e59c'],
+        ['#0fd850', '#f9f047'],
+        ['#007adf', '#00ecbc'],
+        ['#B6CEE8', '#F578DC'],
+        ['#9be15d', '#00e3ae']
+    ];
+
+    let waves = [];
+
+    const init = () => {
+        waves = []
+        for (let i = 0; i < 2; i++) {
+            const [start, stop] = gradients[Math.floor(Math.random() * gradients.length)];
+            const colors = ['#DBB77A', '#BF8F3B'];
+            waves.push(new Wave(canvas, {
+                start,
+                stop,
+                lineWidth: 1,
+                yOffset: .6,
+                fillStyle: colors[i%2],
+                xSpeed: valueMapping(Math.random(), 0, 1, -0.05, -0.08),
+                amplitude: valueMapping(Math.random(), 0, 1, 0.05, 0.5),
+                offset: Math.random() * 100
+            }))
+        }
+    };
+
+    const drawCircle = () => {
+        const r = canvas.height/2;
+        const lineWidth = 5;
+        ctx.lineWidth = lineWidth;
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2, r-lineWidth, 0, 2*Math.PI);
+        ctx.stroke();
+        ctx.fill();
+        ctx.clip();
+        isDrawCircle = true;
+    }
+
+    document.addEventListener('click', () => {
+        init()
+    });
+
+    init();
+
+    canvas.run(ctx => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        waves.forEach(wave => {
+            wave.draw(ctx)
+        })
+    });
+
+    canvas.onResize(() => {
+        init()
+    })
+
+</script>
+
+</html>

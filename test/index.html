@@ -14,7 +14,7 @@
         <canvas id="tutorial" width="300" height="300" style="border:1px solid #d3d3d3;">
 
         </canvas>
-        <canvas id="tutorial2" width="300" height="300" style="border:1px solid #d3d3d3;margin-left: -1px;">
+        <canvas id="tutorial2" width="600" height="300" style="border:1px solid #d3d3d3;margin-left: -1px;">
 
         </canvas>
     </div>
@@ -27,23 +27,41 @@
     earth.src = "earth.jpg";
     // let time = new Date();
     function draw() {
-        let time = new Date();
-        ctx.clearRect(0, 0, 300, 300);
-        ctx.save();
-        ctx.translate(150, 150);
+        ctx.fillRect(0,0,300,300);
+        for (var i=0;i<3;i++) {
+            for (var j=0;j<3;j++) {
+            ctx.save();
+            ctx.strokeStyle = "#9CFF00";
+            ctx.translate(50+j*100,50+i*100);
+            drawSpirograph(ctx,20*(j+2)/(j+1),-8*(i+3)/(i+1),10);
+            ctx.restore();
+            }
+        }
+        // let time = new Date();
+        // ctx.clearRect(0, 0, 300, 300);
+        // ctx.save();
+        // ctx.translate(150, 150);
         
         // ctx.rotate(Math.PI * 2 / (1 * 6));
-        ctx.beginPath();
-        ctx.rotate(2 * Math.PI / 60 * time.getSeconds() + 2 * Math.PI / 60000 * time.getMilliseconds());
+        // ctx.beginPath();
+        // var radgrad = ctx.createRadialGradient(75,75,20,75,75,75);
+        // radgrad.addColorStop(0, 'white');
+        // radgrad.addColorStop(0.9, '#019F62');
+        // radgrad.addColorStop(1, 'rgba(0,0,0,0.5)');
+        // ctx.fillStyle = radgrad;
+        // ctx.strokeStyle = radgrad;
+        // ctx.fillRect(10,10,130,130);
+        // ctx.fillRect(0,0,150,150);
+        // ctx.rotate((2 * Math.PI / 60 * time.getSeconds() + 2 * Math.PI / 60000 * time.getMilliseconds())*10);
         // ctx.translate(100, 0);
         // ctx.fillRect(0,0,100,100);
-        ctx.moveTo(0, 0);
+        // ctx.moveTo(0, 0);
         // ctx.lineTo(100,0);
-        ctx.scale(1.2,1.2);
-        ctx.arc(0, 0, 100, 0, .5*Math.PI);
-        ctx.lineTo(0,0);
+        // ctx.scale(1.2,1.2);
+        // ctx.arc(0, 0, 100, 0, .5*Math.PI);
+        // ctx.lineTo(0,0);
         // ctx.fill();
-        ctx.stroke();
+        // ctx.stroke();
         // ctx.translate(100, 0);
         // ctx.drawImage(earth, -12, -12)
         // ctx.clearRect(45,45,60,60);
@@ -65,32 +83,111 @@
         // ctx.stroke();
 
         // ctx.closePath();
-        ctx.restore();
-        requestAnimationFrame(draw);
+        // ctx.restore();
+        // requestAnimationFrame(draw);
     }
     draw();
     function draw2() {
         var canvas = document.getElementById('tutorial2');
         if (!canvas.getContext) return;
         var ctx = canvas.getContext("2d");
+        var raf;
+        var running = false;
 
-        ctx.translate(150, 150);
-
-        for (var i = 1; i < 6; i++) { // Loop through rings (from inside to out)
-            ctx.save();
-            ctx.fillStyle = 'rgb(' + (51 * i) + ',' + (255 - 51 * i) + ',255)';
-
-            for (var j = 0; j < i * 6; j++) { // draw individual dots
-                ctx.rotate(Math.PI * 2 / (i * 6));
+        var ball = {
+            x: 100,
+            y: 100,
+            vx: 3,
+            vy: 2,
+            radius: 25,
+            color: 'red',
+            draw: function() {
                 ctx.beginPath();
-                ctx.arc(0, i * 25, 10, 0, Math.PI * 2, true);
+                ctx.arc(this.x, this.y, this.radius, 0, 2*Math.PI, true);
+                ctx.closePath();
+                ctx.fillStyle = this.color;
                 ctx.fill();
             }
+        };
 
-            ctx.restore();
+        function draw() {
+            // ctx.clearRect(0, 0, canvas.width, canvas.height);
+            clear();
+            ball.draw();
+            if (ball.y + ball.vy > canvas.height-25 || ball.y + ball.vy < 25) {
+                ball.vy = -ball.vy;
+            }
+            if (ball.x + ball.vx > canvas.width-25 || ball.x + ball.vx < 25) {
+                ball.vx = -ball.vx;
+            }
+            ball.x += ball.vx;
+            ball.y += ball.vy;
+            raf = window.requestAnimationFrame(draw);
         }
+
+        function clear() {
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+        }
+
+        canvas.addEventListener('mousemove', function(e){
+            // raf = window.requestAnimationFrame(draw);
+            if (!running) {
+                clear();
+                ball.x = e.offsetX;
+                ball.y = e.offsetY;
+                ball.draw();
+            }
+        })
+
+        canvas.addEventListener('click',function(e){
+            if (!running) {
+                raf = window.requestAnimationFrame(draw);
+                running = true;
+            }
+        });
+
+        canvas.addEventListener('mouseout', function(e){
+            window.cancelAnimationFrame(raf);
+            running = false;
+        })
+
+        ball.draw();
+
+        // ctx.translate(150, 150);
+
+        // for (var i = 1; i < 6; i++) { // Loop through rings (from inside to out)
+        //     ctx.save();
+        //     ctx.fillStyle = 'rgb(' + (51 * i) + ',' + (255 - 51 * i) + ',255)';
+
+        //     for (var j = 0; j < i * 6; j++) { // draw individual dots
+        //         ctx.rotate(Math.PI * 2 / (i * 6));
+        //         ctx.beginPath();
+        //         ctx.arc(0, i * 25, 10, 0, Math.PI * 2, true);
+        //         ctx.fill();
+        //     }
+
+        //     ctx.restore();
+        // }
     }
     draw2();
+    function drawSpirograph(ctx,R,r,O){
+        var x1 = R-O;
+        var y1 = 0;
+        var i  = 1;
+        ctx.beginPath();
+        ctx.moveTo(x1,y1);
+        do {
+            if (i>20000) break;
+            var x2 = (R+r)*Math.cos(i*Math.PI/72) - (r+O)*Math.cos(((R+r)/r)*(i*Math.PI/72))
+            var y2 = (R+r)*Math.sin(i*Math.PI/72) - (r+O)*Math.sin(((R+r)/r)*(i*Math.PI/72))
+            ctx.lineTo(x2,y2);
+            x1 = x2;
+            y1 = y2;
+            i++;
+        } while (x2 != R-O && y2 != 0 );
+        ctx.stroke();
+    }
 </script>
 
 </html>
